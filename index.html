@@ -260,5 +260,22 @@ footer .wrap{display:grid;gap:10px}
   </div>
 </footer>
 
+<script>
+(function(){
+  var E='https://khemxmwuqrordratgfew.supabase.co/functions/v1/traccia';
+  var q=new URLSearchParams(location.search), rif=Math.random().toString(36).slice(2,12);
+  var u={utm_source:q.get('utm_source'),utm_medium:q.get('utm_medium'),utm_campaign:q.get('utm_campaign'),utm_content:q.get('utm_content')};
+  if(!u.utm_source&&q.get('fbclid')){u.utm_source='meta';u.utm_medium='paid';}
+  function send(ev){try{var d=JSON.stringify(Object.assign({evento:ev,pagina:location.pathname,referrer:document.referrer,rif:rif},u));
+    if(!(navigator.sendBeacon&&navigator.sendBeacon(E,d))){fetch(E,{method:'POST',body:d,keepalive:true});}}catch(e){}}
+  if(q.get('test')!=='1')send('visita');
+  var orig=((u.utm_source||'diretto')+'-'+(u.utm_campaign||'na')+'-'+rif).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,150);
+  document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){
+    var sub=a.href==="https://buy.stripe.com/14AaEX86a4rj7M8esU77O01";
+    try{var x=new URL(a.href);x.searchParams.set('client_reference_id',orig);a.href=x.toString();}catch(e){}
+    a.addEventListener('click',function(){send(sub?'click_abbonamento':'click_pdf');});
+  });
+})();
+</script>
 </body>
 </html>
