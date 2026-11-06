@@ -129,6 +129,24 @@ footer .wrap{display:grid;gap:10px}
   .covers .back{animation-name:rise2}
   @keyframes rise2{from{transform:translateY(12px) rotate(4deg)}to{transform:rotate(4deg)}}
 }
+
+.lead{background:var(--navy);color:var(--onnavy)}
+.lead .wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+.lead h2{color:var(--onnavy)} .lead p.muted{color:var(--onnavy2)}
+.lead form{background:var(--navy2);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:22px;display:grid;gap:12px}
+.lead input[type=email]{font:inherit;font-size:16px;padding:13px 14px;border-radius:6px;border:1px solid #9cc0ec55;background:#0b2039;color:#fff;width:100%}
+.lead label.chk{display:flex;gap:10px;font-size:13px;line-height:1.45;color:var(--onnavy2);align-items:flex-start}
+.lead label.chk input{margin-top:3px;width:18px;height:18px;flex:none}
+.lead label.chk a{color:var(--onnavy)}
+.lead .esito{font-size:14px;min-height:20px}
+.lead .hp{position:absolute;left:-9999px}
+@media (max-width:820px){.lead .wrap{grid-template-columns:1fr}}
+#cookiebar{position:fixed;left:12px;right:12px;bottom:12px;z-index:50;max-width:760px;margin:0 auto;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:16px 18px;display:none;gap:14px;align-items:center;flex-wrap:wrap;font-size:14px;line-height:1.45}
+#cookiebar p{flex:1 1 320px;margin:0}
+#cookiebar a{color:var(--blue)}
+#cookiebar button{font:inherit;font-weight:600;font-size:14px;padding:10px 18px;border-radius:6px;border:1.5px solid var(--blue);cursor:pointer}
+#cookiebar .no{background:transparent;color:var(--blue)} #cookiebar .si{background:var(--blue);color:#fff}
+footer .legal a{color:inherit}
 </style>
 </head>
 <body>
@@ -144,6 +162,7 @@ footer .wrap{display:grid;gap:10px}
         <a class="btn primary" href="https://buy.stripe.com/fZu7sL86af5X2rO3Og77O02" target="_blank" rel="noopener">Acquista il PDF · 17 €</a>
         <a class="btn ghost" href="#prezzi">Con aggiornamenti mensili</a>
       </div>
+      <p class="meta" style="margin-top:14px"><a href="#anteprima" style="color:var(--onnavy);font-weight:600">Oppure leggi gratis 3 schede complete →</a></p>
       <p class="meta">Prezzi di borsa del 4–6 novembre 2026 · PDF scaricabile subito dopo il pagamento</p>
     </div>
     <div class="covers" aria-hidden="true">
@@ -209,6 +228,24 @@ footer .wrap{display:grid;gap:10px}
   </div>
 </section>
 
+
+<section class="band lead" id="anteprima">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow" style="color:var(--onnavy2)">Anteprima gratuita</div>
+      <h2>Prima di acquistare, leggi 3 schede complete.</h2>
+      <p class="muted" style="margin-top:14px;max-width:34em">Ferrari, Intesa Sanpaolo e Nvidia, con la spiegazione di come leggerle. Ti arrivano subito via email, in PDF.</p>
+    </div>
+    <form id="leadform" novalidate>
+      <input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email">
+      <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima gratuita e alcune email informative di Ad Maiora sul volume (massimo 4). Posso disiscrivermi in qualsiasi momento. <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
+      <button class="btn primary" type="submit">Inviami l'anteprima</button>
+      <div class="esito" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+
 <section class="band" id="prezzi">
   <div class="wrap">
     <div class="eyebrow muted">Prezzi</div>
@@ -255,7 +292,7 @@ footer .wrap{display:grid;gap:10px}
 
 <footer>
   <div class="wrap">
-    <div><b>Ad Maiora</b> · Valore intrinseco vs prezzo di borsa</div>
+    <div><b>Ad Maiora</b> · Valore intrinseco vs prezzo di borsa</div><div class="legal"><a href="privacy.html">Privacy e cookie</a> · <a href="#" id="prefcookie">Preferenze cookie</a></div>
     <div>Le informazioni hanno scopo esclusivamente didattico e non costituiscono consulenza finanziaria, sollecitazione all'investimento o raccomandazione di acquisto o vendita di strumenti finanziari. Le stime dipendono da ipotesi che possono rivelarsi errate. I rendimenti passati non sono indicativi di quelli futuri.</div>
   </div>
 </footer>
@@ -274,6 +311,45 @@ footer .wrap{display:grid;gap:10px}
     var sub=a.href==="https://buy.stripe.com/14AaEX86a4rj7M8esU77O01";
     try{var x=new URL(a.href);x.searchParams.set('client_reference_id',orig);a.href=x.toString();}catch(e){}
     a.addEventListener('click',function(){send(sub?'click_abbonamento':'click_pdf');});
+  });
+})();
+</script>
+<div id="cookiebar" role="dialog" aria-label="Cookie">
+  <p>Con il tuo consenso usiamo i cookie di Meta (Facebook e Instagram) per misurare le nostre inserzioni e mostrarti contenuti di Ad Maiora. Senza consenso il sito funziona lo stesso. <a href="privacy.html#cookie">Dettagli</a></p>
+  <button class="no" type="button">Rifiuta</button><button class="si" type="button">Accetta</button>
+</div>
+<script>
+(function(){
+  var PIXEL="", FN="https://khemxmwuqrordratgfew.supabase.co/functions/v1";
+  function scelta(){try{return localStorage.getItem('am_consenso')}catch(e){return null}}
+  function salva(v){try{localStorage.setItem('am_consenso',v)}catch(e){}}
+  var caricato=false;
+  function pixel(){ if(caricato||!PIXEL)return; caricato=true;
+    !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init',PIXEL); fbq('track','PageView'); }
+  window.amTrack=function(ev){ if(caricato&&window.fbq) fbq('track',ev); };
+  var bar=document.getElementById('cookiebar');
+  function mostra(){ if(PIXEL) bar.style.display='flex'; }
+  if(PIXEL){ var s=scelta(); if(s==='si') pixel(); else if(s!=='no') mostra(); }
+  bar.querySelector('.si').onclick=function(){salva('si');bar.style.display='none';pixel();};
+  bar.querySelector('.no').onclick=function(){salva('no');bar.style.display='none';};
+  var pref=document.getElementById('prefcookie'); if(pref) pref.onclick=function(e){e.preventDefault(); if(PIXEL) bar.style.display='flex'; else alert('Questo sito non usa cookie di profilazione.');};
+  document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){a.addEventListener('click',function(){amTrack('InitiateCheckout');});});
+
+  var f=document.getElementById('leadform'); if(!f) return;
+  var out=f.querySelector('.esito'), btn=f.querySelector('button');
+  f.addEventListener('submit',function(e){ e.preventDefault();
+    var email=f.email.value.trim(), ok=f.consenso.checked;
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){out.textContent='Controlla l\'indirizzo email.';return;}
+    if(!ok){out.textContent='Spunta la casella del consenso per ricevere l\'anteprima.';return;}
+    var q=new URLSearchParams(location.search), fonte=[q.get('utm_source')||'diretto',q.get('utm_campaign')||''].filter(Boolean).join('/');
+    btn.disabled=true; out.textContent='Invio in corso…';
+    fetch(FN+'/lead/iscrivi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,consenso:true,fonte:fonte,sito:f.sito.value})})
+      .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+      .then(function(x){ if(x.ok){ out.textContent='Fatto! Controlla la tua email (anche la cartella spam o promozioni).'; f.email.value=''; amTrack('Lead');
+          try{navigator.sendBeacon(FN+'/traccia',JSON.stringify({evento:'iscrizione',pagina:location.pathname}));}catch(e){} }
+        else { out.textContent=(x.j&&x.j.errore)||'Qualcosa non ha funzionato, riprova.'; btn.disabled=false; } })
+      .catch(function(){ out.textContent='Connessione assente, riprova.'; btn.disabled=false; });
   });
 })();
 </script>
