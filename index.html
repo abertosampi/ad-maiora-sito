@@ -314,6 +314,11 @@ footer .legal a{color:inherit}
   function send(ev){try{var d=JSON.stringify(Object.assign({evento:ev,pagina:location.pathname,referrer:document.referrer,rif:rif},u));
     if(!(navigator.sendBeacon&&navigator.sendBeacon(E,d))){fetch(E,{method:'POST',body:d,keepalive:true});}}catch(e){}}
   var test=q.get('test')==='1';
+  // diagnostica: tempo dall'apertura al via dello script, visibilità iniziale, prerender, tocchi e scorrimenti
+  var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};
+  var dg={car_ms:Math.round(performance.now()),vis0:document.visibilityState==='visible'?1:0,pre:document.prerendering?1:0,att_ms:Math.round(nav.activationStart||0),risp_ms:Math.round(nav.responseStart||0),tocchi:0,scroll_ev:0,vis_ev:0};
+  addEventListener('touchstart',function(){dg.tocchi++;},{passive:true});
+  addEventListener('scroll',function(){dg.scroll_ev++;},{passive:true});
   if(!test)send('visita');
   // tempo di lettura (solo con la pagina visibile), scorrimento massimo, sezione prezzi vista
   var attivo=0, dal=document.visibilityState==='visible'?Date.now():null, scr=0, prezzi=false;
@@ -331,9 +336,9 @@ footer .legal a{color:inherit}
   function dove(){var c=innerHeight/2; for(var i=0;i<SEZ.length;i++){var r=SEZ[i][0].getBoundingClientRect(); if(r.top<=c&&r.bottom>c)return SEZ[i][1];} return cur;}
   setInterval(function(){ if(document.visibilityState!=='visible')return; cur=dove(); if(cur)tsez[cur]=(tsez[cur]||0)+1; },1000);
   function esci(){ if(dal){attivo+=Date.now()-dal;dal=null;} if(test)return; misura(); cur=dove()||cur;
-    try{var d=JSON.stringify(Object.assign({evento:'uscita',pagina:location.pathname,referrer:document.referrer,rif:rif,durata_s:Math.round(attivo/1000),scroll_pct:scr,prezzi_visti:prezzi,sezioni:tsez,ultima_sezione:cur},u));
+    try{var d=JSON.stringify(Object.assign({evento:'uscita',pagina:location.pathname,referrer:document.referrer,rif:rif,durata_s:Math.round(attivo/1000),scroll_pct:scr,prezzi_visti:prezzi,sezioni:tsez,ultima_sezione:cur,diag:dg},u));
       if(!(navigator.sendBeacon&&navigator.sendBeacon(E,d))){fetch(E,{method:'POST',body:d,keepalive:true});}}catch(e){} }
-  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')esci(); else dal=Date.now(); });
+  document.addEventListener('visibilitychange',function(){ dg.vis_ev++; if(document.visibilityState==='hidden')esci(); else dal=Date.now(); });
   addEventListener('pagehide',esci);
   var orig=((u.utm_source||'diretto')+'-'+(u.utm_campaign||'na')+'-'+rif).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,150);
   document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){
