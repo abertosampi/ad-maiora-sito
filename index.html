@@ -305,7 +305,28 @@ footer .legal a{color:inherit}
   if(!u.utm_source&&q.get('fbclid')){u.utm_source='meta';u.utm_medium='paid';}
   function send(ev){try{var d=JSON.stringify(Object.assign({evento:ev,pagina:location.pathname,referrer:document.referrer,rif:rif},u));
     if(!(navigator.sendBeacon&&navigator.sendBeacon(E,d))){fetch(E,{method:'POST',body:d,keepalive:true});}}catch(e){}}
-  if(q.get('test')!=='1')send('visita');
+  var test=q.get('test')==='1';
+  if(!test)send('visita');
+  // tempo di lettura (solo con la pagina visibile), scorrimento massimo, sezione prezzi vista
+  var attivo=0, dal=document.visibilityState==='visible'?Date.now():null, scr=0, prezzi=false;
+  function misura(){var h=document.documentElement, tot=h.scrollHeight-innerHeight; if(tot>0)scr=Math.max(scr,Math.round(scrollY/tot*100));}
+  addEventListener('scroll',misura,{passive:true});
+  var pz=document.getElementById('prezzi');
+  if(pz&&'IntersectionObserver' in window){new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)prezzi=true;});},{threshold:0.3}).observe(pz);}
+  // sezioni: ogni secondo (pagina visibile) conta la sezione al centro dello schermo
+  var SEZ=[]; document.querySelectorAll('header.hero,.strip,section,footer').forEach(function(el){
+    var h=(el.querySelector('h2')||{}).textContent||'', n;
+    if(el.matches('header'))n='apertura'; else if(el.classList.contains('strip'))n='esempi'; else if(el.matches('footer'))n='fondo';
+    else if(el.id)n=el.id; else if(/stesso modello/i.test(h))n='metodo'; else if(/mediana/i.test(h))n='mercati'; else if(/domande/i.test(h))n='faq'; else n='scheda';
+    SEZ.push([el,n]); });
+  var tsez={}, cur=null;
+  function dove(){var c=innerHeight/2; for(var i=0;i<SEZ.length;i++){var r=SEZ[i][0].getBoundingClientRect(); if(r.top<=c&&r.bottom>c)return SEZ[i][1];} return cur;}
+  setInterval(function(){ if(document.visibilityState!=='visible')return; cur=dove(); if(cur)tsez[cur]=(tsez[cur]||0)+1; },1000);
+  function esci(){ if(dal){attivo+=Date.now()-dal;dal=null;} if(test)return; misura(); cur=dove()||cur;
+    try{var d=JSON.stringify(Object.assign({evento:'uscita',pagina:location.pathname,referrer:document.referrer,rif:rif,durata_s:Math.round(attivo/1000),scroll_pct:scr,prezzi_visti:prezzi,sezioni:tsez,ultima_sezione:cur},u));
+      if(!(navigator.sendBeacon&&navigator.sendBeacon(E,d))){fetch(E,{method:'POST',body:d,keepalive:true});}}catch(e){} }
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')esci(); else dal=Date.now(); });
+  addEventListener('pagehide',esci);
   var orig=((u.utm_source||'diretto')+'-'+(u.utm_campaign||'na')+'-'+rif).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,150);
   document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){
     var sub=a.href==="https://buy.stripe.com/14AaEX86a4rj7M8esU77O01";
