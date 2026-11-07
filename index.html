@@ -221,6 +221,24 @@ footer .legal a{color:inherit}
   </div>
 </section>
 
+
+<section class="band lead lead2" id="anteprima2">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow" style="color:var(--onnavy2)">Gratis, subito via email</div>
+      <h2>Ti è piaciuta questa scheda? Ricevi quelle di Ferrari, Intesa Sanpaolo e NVIDIA.</h2>
+      <p class="muted" style="margin-top:14px;max-width:34em">Tre schede complete del volume, con la spiegazione di come leggerle, in un PDF.</p>
+    </div>
+    <form class="leadform" data-pos="scheda" novalidate>
+      <input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email">
+      <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima gratuita e alcune email informative di Ad Maiora sul volume (massimo 4). Posso disiscrivermi in qualsiasi momento. <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
+      <button class="btn primary" type="submit">Inviami le 3 schede</button>
+      <div class="esito" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+</section>
+
 <section class="band" style="background:var(--card);border-block:1px solid var(--line)">
   <div class="wrap">
     <div class="eyebrow muted">I cinque mercati</div>
@@ -244,7 +262,7 @@ footer .legal a{color:inherit}
       <h2>Prima di acquistare, leggi 3 schede complete.</h2>
       <p class="muted" style="margin-top:14px;max-width:34em">Ferrari, Intesa Sanpaolo e Nvidia, con la spiegazione di come leggerle. Ti arrivano subito via email, in PDF.</p>
     </div>
-    <form id="leadform" novalidate>
+    <form id="leadform" class="leadform" data-pos="fondo" novalidate>
       <input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email">
       <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
       <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima gratuita e alcune email informative di Ad Maiora sul volume (massimo 4). Posso disiscrivermi in qualsiasi momento. <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
@@ -373,13 +391,13 @@ footer .legal a{color:inherit}
   var pref=document.getElementById('prefcookie'); if(pref) pref.onclick=function(e){e.preventDefault(); if(PIXEL) bar.style.display='flex'; else alert('Questo sito non usa cookie di profilazione.');};
   document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){a.addEventListener('click',function(){amTrack('InitiateCheckout');});});
 
-  var f=document.getElementById('leadform'); if(!f) return;
+  document.querySelectorAll('form.leadform').forEach(function(f){
   var out=f.querySelector('.esito'), btn=f.querySelector('button');
   f.addEventListener('submit',function(e){ e.preventDefault();
     var email=f.email.value.trim(), ok=f.consenso.checked;
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){out.textContent='Controlla l\'indirizzo email.';return;}
     if(!ok){out.textContent='Spunta la casella del consenso per ricevere l\'anteprima.';return;}
-    var q=new URLSearchParams(location.search), fonte=[q.get('utm_source')||'diretto',q.get('utm_campaign')||''].filter(Boolean).join('/');
+    var q=new URLSearchParams(location.search), fonte=[q.get('utm_source')||'diretto',q.get('utm_campaign')||'',f.getAttribute('data-pos')||''].filter(Boolean).join('/');
     btn.disabled=true; out.textContent='Invio in corso…';
     fetch(FN+'/lead/iscrivi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,consenso:true,fonte:fonte,sito:f.sito.value})})
       .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
@@ -387,6 +405,7 @@ footer .legal a{color:inherit}
           if(q.get('test')!=='1'){try{navigator.sendBeacon(FN+'/traccia',JSON.stringify({evento:'iscrizione',pagina:location.pathname,utm_source:q.get('utm_source'),utm_campaign:q.get('utm_campaign')}));}catch(e){}} }
         else { out.textContent=(x.j&&x.j.errore)||'Qualcosa non ha funzionato, riprova.'; btn.disabled=false; } })
       .catch(function(){ out.textContent='Connessione assente, riprova.'; btn.disabled=false; });
+  });
   });
 })();
 </script>
