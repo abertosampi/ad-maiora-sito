@@ -316,7 +316,7 @@ footer .legal a{color:inherit}
   var test=q.get('test')==='1';
   // diagnostica: tempo dall'apertura al via dello script, visibilità iniziale, prerender, tocchi e scorrimenti
   var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};
-  var dg={car_ms:Math.round(performance.now()),vis0:document.visibilityState==='visible'?1:0,pre:document.prerendering?1:0,att_ms:Math.round(nav.activationStart||0),risp_ms:Math.round(nav.responseStart||0),tocchi:0,scroll_ev:0,vis_ev:0};
+  var dg={car_ms:Math.round(performance.now()),visibile_ini:document.visibilityState==='visible'?1:0,pre:document.prerendering?1:0,att_ms:Math.round(nav.activationStart||0),risp_ms:Math.round(nav.responseStart||0),tocchi:0,scroll_ev:0,vis_ev:0};
   addEventListener('touchstart',function(){dg.tocchi++;},{passive:true});
   addEventListener('scroll',function(){dg.scroll_ev++;},{passive:true});
   if(!test)send('visita');
