@@ -347,7 +347,7 @@ footer .legal a{color:inherit}
     fetch(FN+'/lead/iscrivi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,consenso:true,fonte:fonte,sito:f.sito.value})})
       .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
       .then(function(x){ if(x.ok){ out.textContent='Fatto! Controlla la tua email (anche la cartella spam o promozioni).'; f.email.value=''; amTrack('Lead');
-          try{navigator.sendBeacon(FN+'/traccia',JSON.stringify({evento:'iscrizione',pagina:location.pathname}));}catch(e){} }
+          if(q.get('test')!=='1'){try{navigator.sendBeacon(FN+'/traccia',JSON.stringify({evento:'iscrizione',pagina:location.pathname,utm_source:q.get('utm_source'),utm_campaign:q.get('utm_campaign')}));}catch(e){}} }
         else { out.textContent=(x.j&&x.j.errore)||'Qualcosa non ha funzionato, riprova.'; btn.disabled=false; } })
       .catch(function(){ out.textContent='Connessione assente, riprova.'; btn.disabled=false; });
   });
