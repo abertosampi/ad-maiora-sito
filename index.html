@@ -183,7 +183,7 @@ footer .legal a{color:inherit}
         <div class="hf-t">Gratis: 3 schede complete via email (Ferrari, Intesa Sanpaolo, NVIDIA)</div>
         <div class="hf-r"><input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email"><button class="btn primary" type="submit">Inviamele</button></div>
         <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima e alcune email informative di Ad Maiora (massimo 4). Posso disiscrivermi quando voglio. <a href="privacy.html" target="_blank">Privacy</a></span></label>
+        <label class="chk"><input type="checkbox" name="consenso"><span>Facoltativo: voglio ricevere anche 3 email di approfondimento. <a href="privacy.html" target="_blank">Privacy</a></span></label>
         <div class="esito" role="status" aria-live="polite"></div>
       </form>
       <p class="lead">Lo stesso confronto tra prezzo e valore intrinseco per 350 società di Piazza Affari, Nasdaq-100, DAX, CAC 40 e FTSE 100: una scheda per azienda, con le ipotesi in chiaro.</p>
@@ -251,7 +251,7 @@ footer .legal a{color:inherit}
     <form class="leadform" data-pos="scheda" novalidate>
       <input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email">
       <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima gratuita e alcune email informative di Ad Maiora sul volume (massimo 4). Posso disiscrivermi in qualsiasi momento. <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
+      <label class="chk"><input type="checkbox" name="consenso"><span>Facoltativo: voglio ricevere anche 3 email di approfondimento (posso disiscrivermi quando voglio). <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
       <button class="btn primary" type="submit">Inviami le 3 schede</button>
       <div class="esito" role="status" aria-live="polite"></div>
     </form>
@@ -284,7 +284,7 @@ footer .legal a{color:inherit}
     <form id="leadform" class="leadform" data-pos="fondo" novalidate>
       <input type="email" name="email" placeholder="La tua email" autocomplete="email" required aria-label="La tua email">
       <input class="hp" type="text" name="sito" tabindex="-1" autocomplete="off" aria-hidden="true">
-      <label class="chk"><input type="checkbox" name="consenso" required><span>Acconsento a ricevere l'anteprima gratuita e alcune email informative di Ad Maiora sul volume (massimo 4). Posso disiscrivermi in qualsiasi momento. <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
+      <label class="chk"><input type="checkbox" name="consenso"><span>Facoltativo: voglio ricevere anche 3 email di approfondimento (posso disiscrivermi quando voglio). <a href="privacy.html" target="_blank">Informativa privacy</a></span></label>
       <button class="btn primary" type="submit">Inviami l'anteprima</button>
       <div class="esito" role="status" aria-live="polite"></div>
     </form>
@@ -411,14 +411,17 @@ footer .legal a{color:inherit}
   document.querySelectorAll('a[href*="buy.stripe.com"]').forEach(function(a){a.addEventListener('click',function(){amTrack('InitiateCheckout');});});
 
   document.querySelectorAll('form.leadform').forEach(function(f){
-  var out=f.querySelector('.esito'), btn=f.querySelector('button');
+  var out=f.querySelector('.esito'), btn=f.querySelector('button'), pos=f.getAttribute('data-pos')||'';
+  var q0=new URLSearchParams(location.search);
+  function ev(nome,extra){ if(q0.get('test')==='1') return; try{navigator.sendBeacon(FN+'/traccia',JSON.stringify(Object.assign({evento:nome,pagina:location.pathname,utm_source:q0.get('utm_source'),utm_campaign:q0.get('utm_campaign'),ultima_sezione:pos.slice(0,20)},extra||{})));}catch(e){} }
+  var toccato=false; f.email.addEventListener('focus',function(){ if(!toccato){toccato=true; ev('modulo_tocco');} });
   f.addEventListener('submit',function(e){ e.preventDefault();
     var email=f.email.value.trim(), ok=f.consenso.checked;
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){out.textContent='Controlla l\'indirizzo email.';return;}
-    if(!ok){out.textContent='Spunta la casella del consenso per ricevere l\'anteprima.';return;}
-    var q=new URLSearchParams(location.search), fonte=[q.get('utm_source')||'diretto',q.get('utm_campaign')||'',f.getAttribute('data-pos')||''].filter(Boolean).join('/');
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){out.textContent='Controlla l\'indirizzo email.'; ev('modulo_errore'); return;}
+    ev('modulo_invio');
+    var q=q0, fonte=[q.get('utm_source')||'diretto',q.get('utm_campaign')||'',pos].filter(Boolean).join('/');
     btn.disabled=true; out.textContent='Invio in corso…';
-    fetch(FN+'/lead/iscrivi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,consenso:true,fonte:fonte,sito:f.sito.value})})
+    fetch(FN+'/lead/iscrivi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email,consenso:ok,fonte:fonte,sito:f.sito.value})})
       .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
       .then(function(x){ if(x.ok){ out.textContent='Fatto! Controlla la tua email (anche la cartella spam o promozioni).'; f.email.value=''; amTrack('Lead');
           if(q.get('test')!=='1'){try{navigator.sendBeacon(FN+'/traccia',JSON.stringify({evento:'iscrizione',pagina:location.pathname,utm_source:q.get('utm_source'),utm_campaign:q.get('utm_campaign')}));}catch(e){}} }
